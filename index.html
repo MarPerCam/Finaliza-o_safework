@@ -93,30 +93,29 @@ body {
   position: absolute;
   inset: 0;
   background: var(--bg);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
   opacity: 0;
   pointer-events: none;
   transform: translateX(30px);
   transition: opacity 0.32s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.4,0,.2,1);
+  
+  /* NOVAS PROPRIEDADES PARA FIXAR A NAV */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Impede que a tela inteira role */
 }
-.screen::-webkit-scrollbar { display: none; }
-.screen.active {
-  opacity: 1;
-  pointer-events: all;
-  transform: translateX(0);
-}
-.screen.slide-back {
-  transform: translateX(-30px);
+
+/* ── SCROLLABLE CONTENT AREA ───────────────────────────── */
+.scroll-area {
+  padding: 56px 0 20px; /* Reduzi o padding inferior aqui */
+  flex: 1;             /* Ocupa todo o espaço acima da nav */
+  overflow-y: auto;    /* Habilita o scroll apenas aqui dentro */
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── BOTTOM NAV ────────────────────────────────────────── */
 .bottom-nav {
-  position: absolute; /* Mantenha absolute para ficar relativo ao .phone */
-  bottom: 0; 
-  left: 0; 
-  right: 0;
+  position: relative; /* Mudado de absolute para relative */
   height: 80px;
   background: rgba(11,25,41,0.97);
   backdrop-filter: blur(20px);
@@ -124,7 +123,8 @@ body {
   display: flex;
   align-items: flex-start;
   padding-top: 10px;
-  z-index: 1000; /* Aumente o z-index para garantir que fique sobre o conteúdo */
+  z-index: 1000;
+  flex-shrink: 0; /* Garante que a barra não seja esmagada */
 }
 .nav-item {
   flex: 1;
@@ -147,12 +147,6 @@ body {
   background: var(--danger);
   position: absolute;
   top: 8px; right: calc(50% - 15px);
-}
-
-/* ── SCROLLABLE CONTENT AREA ───────────────────────────── */
-.scroll-area {
-  padding: 56px 0 90px;
-  min-height: 100%;
 }
 
 /* ── COMPONENTS ────────────────────────────────────────── */
