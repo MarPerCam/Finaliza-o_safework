@@ -113,8 +113,10 @@ body {
 
 /* ── BOTTOM NAV ────────────────────────────────────────── */
 .bottom-nav {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
+  position: absolute; /* Mantenha absolute para ficar relativo ao .phone */
+  bottom: 0; 
+  left: 0; 
+  right: 0;
   height: 80px;
   background: rgba(11,25,41,0.97);
   backdrop-filter: blur(20px);
@@ -122,7 +124,7 @@ body {
   display: flex;
   align-items: flex-start;
   padding-top: 10px;
-  z-index: 50;
+  z-index: 1000; /* Aumente o z-index para garantir que fique sobre o conteúdo */
 }
 .nav-item {
   flex: 1;
@@ -822,9 +824,9 @@ body {
       <div class="home-header fade-in">
         <div>
           <div class="home-greeting">Bom dia,</div>
-          <div class="home-name">Ana Costa 👷</div>
+          <div class="home-name">Marcelo Perotta</div>
         </div>
-        <div class="avatar" onclick="goTo('profile')">AC</div>
+        <div class="avatar" onclick="goTo('profile')">MP</div>
       </div>
 
       <!-- Alert banner - interactive -->
@@ -1262,7 +1264,7 @@ body {
     <div class="scroll-area">
       <div class="profile-hero fade-in">
         <div class="profile-avatar-big">AC</div>
-        <div class="profile-name">Ana Costa</div>
+        <div class="profile-name">Marcelo Perotta</div>
         <div class="profile-role">Costureira Sênior · Setor B</div>
         <div class="profile-badges">
           <div class="profile-badge" style="background:rgba(0,201,167,0.15); color:var(--primary);">🏆 7 dias seguro</div>
@@ -1273,7 +1275,7 @@ body {
       <div class="stats-row card fade-in delay-1" style="margin:0 16px 12px; padding:0; display:flex;">
         <div class="stat-item">
           <div class="stat-val" style="color:var(--primary);">12</div>
-          <div class="stat-lbl">EPIs hoje</div>
+          <div class="stat-lbl">Nº EPIs</div>
         </div>
         <div class="stat-item">
           <div class="stat-val" style="color:var(--warn);">3</div>
@@ -1357,7 +1359,7 @@ body {
       </div>
 
       <div style="text-align:center; padding:20px 0 8px; font-size:11px; color:var(--text3);">
-        SafeWork Pro v1.0.0 · SENAI Paraná · 2025
+        SafeWork v1.0.0 · SESI Referência de Maringá · 2025
       </div>
     </div>
     <div class="bottom-nav">
