@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeWork Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0B1929;
+  --bg2: #0F2237;
+  --bg3: #132942;
+  --card: #152f4a;
+  --card2: #1a3a58;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --primary: #00C9A7;
+  --primary-dim: rgba(0,201,167,0.15);
+  --primary-glow: rgba(0,201,167,0.3);
+  --warn: #FFB547;
+  --warn-dim: rgba(255,181,71,0.15);
+  --danger: #FF5C5C;
+  --danger-dim: rgba(255,92,92,0.15);
+  --danger-glow: rgba(255,92,92,0.35);
+  --text: #E8F4F0;
+  --text2: #8BAFC4;
+  --text3: #557A94;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #06111c;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* ── PHONE SHELL ───────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 780px;
+  background: #000;
+  border-radius: 46px;
+  border: 2px solid #2a3a4a;
+  box-shadow: 0 0 0 6px #0d1e2e, 0 40px 80px rgba(0,0,0,0.7), inset 0 0 0 1px #1a2a3a;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Notch */
+.phone::before {
+  content: '';
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 200;
+  box-shadow: inset 0 0 0 1px #1a2a3a;
+}
+
+/* Status bar pill */
+.status-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50px;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 24px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  pointer-events: none;
+}
+
+.status-time { font-variant-numeric: tabular-nums; }
+.status-icons { display: flex; gap: 5px; align-items: center; }
+.status-icons svg { width: 14px; height: 14px; }
+
+/* ── SCREENS ───────────────────────────────────────────── */
+.screen {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(30px);
+  transition: opacity 0.32s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.4,0,.2,1);
+  
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ✅ REGRA CRUCIAL PARA ATIVAR A TELA */
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+/* ── SCROLLABLE CONTENT AREA ───────────────────────────────── */
+.scroll-area {
+  padding: 56px 0 90px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-area::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── BOTTOM NAV ────────────────────────────────────────── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: rgba(11,25,41,0.97);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 10px;
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  color: var(--text3);
+}
+.nav-item.active { color: var(--primary); }
+.nav-item svg { width: 22px; height: 22px; }
+.nav-item span { font-size: 10px; font-weight: 500; }
+.nav-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--danger);
+  position: absolute;
+  top: 8px; right: calc(50% - 15px);
+}
+
+/* ── COMPONENTS ────────────────────────────────────────── */
+.page-header {
+  padding: 20px 20px 12px;
+}
+.page-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.15;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 0 16px 12px;
+}
+.card-sm {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── SPLASH SCREEN ─────────────────────────────────────── */
+#splash {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.splash-logo {
+  width: 88px; height: 88px;
+  background: var(--primary-dim);
+  border-radius: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--primary-glow);
+  margin-bottom: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+.splash-logo svg { width: 44px; height: 44px; color: var(--primary); }
+.splash-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px; font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.splash-name span { color: var(--primary); }
+.splash-tag {
+  font-size: 13px; color: var(--text3);
+  margin-top: 6px; margin-bottom: 48px;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #0B1929;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700;
+  border: none; border-radius: 14px;
+  padding: 16px 32px; cursor: pointer;
+  width: 280px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px var(--primary-glow);
+}
+.btn-primary:active { transform: scale(0.97); }
+
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 var(--primary-glow); }
+  50% { box-shadow: 0 0 0 12px transparent; }
+}
+
+/* ── HOME SCREEN ───────────────────────────────────────── */
+.home-header {
+  padding: 18px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.home-greeting { font-size: 13px; color: var(--text2); }
+.home-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700; color: var(--text);
+}
+.avatar {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--primary), #0099a0);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; color: #0B1929;
+  cursor: pointer;
+}
+
+/* Alert banner */
+.alert-banner {
+  margin: 16px 16px 0;
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.alert-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.04);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.alert-banner:active::after { opacity: 1; }
+.alert-banner.green { background: var(--primary-dim); border: 1px solid rgba(0,201,167,0.25); }
+.alert-banner.yellow { background: var(--warn-dim); border: 1px solid rgba(255,181,71,0.3); animation: warn-pulse 2s infinite; }
+.alert-banner.red { background: var(--danger-dim); border: 1px solid rgba(255,92,92,0.35); animation: danger-pulse 1.5s infinite; }
+.alert-icon {
+  width: 46px; height: 46px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.alert-icon svg { width: 24px; height: 24px; }
+.alert-banner.green .alert-icon { background: rgba(0,201,167,0.2); color: var(--primary); }
+.alert-banner.yellow .alert-icon { background: rgba(255,181,71,0.2); color: var(--warn); }
+.alert-banner.red .alert-icon { background: rgba(255,92,92,0.2); color: var(--danger); }
+.alert-text { flex: 1; }
+.alert-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; }
+.alert-banner.green .alert-label { color: var(--primary); }
+.alert-banner.yellow .alert-label { color: var(--warn); }
+.alert-banner.red .alert-label { color: var(--danger); }
+.alert-msg { font-size: 14px; color: var(--text); font-weight: 500; }
+.alert-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+@keyframes warn-pulse {
+  0%,100% { border-color: rgba(255,181,71,0.3); }
+  50% { border-color: rgba(255,181,71,0.6); }
+}
+@keyframes danger-pulse {
+  0%,100% { border-color: rgba(255,92,92,0.35); box-shadow: none; }
+  50% { border-color: rgba(255,92,92,0.7); box-shadow: 0 0 18px var(--danger-glow); }
+}
+
+/* Sensor grid */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px;
+  margin-top: 16px;
+}
+.sensor-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.sensor-card:active { border-color: var(--border2); }
+.sensor-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 8px;
+}
+.sensor-icon { width: 28px; height: 28px; color: var(--text3); }
+.sensor-status {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 6px var(--primary);
+}
+.sensor-status.warn { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+.sensor-status.danger { background: var(--danger); box-shadow: 0 0 6px var(--danger); animation: blink 0.8s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+.sensor-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700; color: var(--text);
+  line-height: 1;
+}
+.sensor-unit { font-size: 13px; font-weight: 400; color: var(--text2); }
+.sensor-name { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.sensor-limit { font-size: 10px; color: var(--text3); }
+
+/* Quick actions */
+.section-label {
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text3);
+  padding: 0 20px;
+  margin: 20px 0 10px;
+}
+.quick-row {
+  display: flex; gap: 10px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.quick-row::-webkit-scrollbar { display: none; }
+.quick-btn {
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  cursor: pointer;
+  min-width: 100px;
+  transition: all 0.2s;
+  text-align: left;
+}
+.quick-btn:active { border-color: var(--primary); background: var(--primary-dim); }
+.quick-btn-icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.quick-btn-icon svg { width: 18px; height: 18px; }
+.quick-btn span { font-size: 12px; font-weight: 500; color: var(--text); }
+
+/* Recent events */
+.event-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.event-item:last-child { border-bottom: none; padding-bottom: 0; }
+.event-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 4px;
+}
+.event-dot.green { background: var(--primary); }
+.event-dot.yellow { background: var(--warn); }
+.event-dot.red { background: var(--danger); }
+.event-body { flex: 1; }
+.event-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.event-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* ── ALERTS SCREEN ─────────────────────────────────────── */
+.risk-meter {
+  margin: 16px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+.meter-label {
+  font-size: 12px; color: var(--text3); margin-bottom: 12px;
+  font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em;
+}
+.meter-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.meter-fill {
+  height: 100%; border-radius: 10px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+.meter-ticks {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--text3);
+}
+
+.alert-card {
+  margin: 0 16px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.alert-card:active { transform: scale(0.98); }
+.alert-card-header {
+  padding: 14px 16px;
+  display: flex; gap: 12px; align-items: center;
+}
+.alert-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  padding: 3px 8px; border-radius: 6px;
+  text-transform: uppercase;
+}
+.badge-green { background: rgba(0,201,167,0.2); color: var(--primary); }
+.badge-yellow { background: rgba(255,181,71,0.2); color: var(--warn); }
+.badge-red { background: rgba(255,92,92,0.2); color: var(--danger); }
+.alert-card-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.alert-card-icon svg { width: 20px; height: 20px; }
+.card-red { background: var(--danger-dim); border-color: rgba(255,92,92,0.25); }
+.card-yellow { background: var(--warn-dim); border-color: rgba(255,181,71,0.2); }
+.card-green { background: var(--primary-dim); border-color: rgba(0,201,167,0.2); }
+.icon-red { background: rgba(255,92,92,0.2); color: var(--danger); }
+.icon-yellow { background: rgba(255,181,71,0.2); color: var(--warn); }
+.icon-green { background: rgba(0,201,167,0.2); color: var(--primary); }
+.alert-card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.alert-card-val { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.alert-card-time { font-size: 11px; color: var(--text3); margin-left: auto; white-space: nowrap; }
+
+/* Simulate buttons */
+.sim-row {
+  display: flex; gap: 8px;
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+.sim-btn {
+  flex: 1; padding: 10px 8px;
+  border-radius: 10px; border: 1.5px solid;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+  background: transparent;
+}
+.sim-btn.green { border-color: var(--primary); color: var(--primary); }
+.sim-btn.green:active { background: var(--primary-dim); }
+.sim-btn.yellow { border-color: var(--warn); color: var(--warn); }
+.sim-btn.yellow:active { background: var(--warn-dim); }
+.sim-btn.red { border-color: var(--danger); color: var(--danger); }
+.sim-btn.red:active { background: var(--danger-dim); }
+
+/* ── EPI CHECKLIST ─────────────────────────────────────── */
+.progress-ring-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0 16px;
+}
+.ring-container { position: relative; width: 110px; height: 110px; margin-bottom: 12px; }
+.ring-container svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 8; }
+.ring-fill {
+  fill: none; stroke: var(--primary); stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  stroke-dashoffset: 283;
+  transition: stroke-dashoffset 0.8s cubic-bezier(.4,0,.2,1);
+}
+.ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.ring-pct {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px; font-weight: 700; color: var(--text);
+}
+.ring-sub { font-size: 10px; color: var(--text3); }
+.ring-label { font-size: 13px; color: var(--text2); }
+
+.function-selector {
+  display: flex; gap: 8px;
+  padding: 0 16px; margin-bottom: 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.function-selector::-webkit-scrollbar { display: none; }
+.func-chip {
+  flex-shrink: 0;
+  padding: 7px 14px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+  border: 1.5px solid var(--border);
+  color: var(--text2);
+  background: transparent;
+}
+.func-chip.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-dim);
+}
+
+.epi-item {
+  display: flex; gap: 14px; align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.epi-item:last-child { border-bottom: none; }
+.epi-item:active { background: rgba(255,255,255,0.03); }
+.epi-checkbox {
+  width: 24px; height: 24px; border-radius: 8px;
+  border: 2px solid var(--border2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.epi-checkbox.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.epi-checkbox svg { width: 14px; height: 14px; color: #0B1929; }
+.epi-info { flex: 1; }
+.epi-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.epi-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.epi-required {
+  font-size: 10px; padding: 2px 7px; border-radius: 6px;
+  font-weight: 600;
+}
+.req-yes { background: rgba(255,92,92,0.15); color: var(--danger); }
+.req-no { background: rgba(255,255,255,0.06); color: var(--text3); }
+
+/* ── TRAINING SCREEN ───────────────────────────────────── */
+.training-card {
+  margin: 0 16px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.training-card:active { transform: scale(0.98); }
+.training-thumb {
+  height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.training-thumb svg { width: 36px; height: 36px; opacity: 0.6; }
+.play-btn {
+  position: absolute;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.play-btn svg { width: 18px; height: 18px; color: #fff; margin-left: 2px; }
+.duration-badge {
+  position: absolute; bottom: 8px; right: 10px;
+  background: rgba(0,0,0,0.6);
+  font-size: 10px; font-weight: 600; color: #fff;
+  padding: 2px 6px; border-radius: 5px;
+}
+.training-body { padding: 14px; }
+.training-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.training-meta {
+  display: flex; gap: 8px; align-items: center;
+}
+.training-meta span { font-size: 11px; color: var(--text3); }
+.training-progress {
+  height: 3px; background: rgba(255,255,255,0.08);
+  border-radius: 3px; margin-top: 10px; overflow: hidden;
+}
+.training-progress-fill {
+  height: 100%; background: var(--primary); border-radius: 3px;
+}
+.completed-badge {
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 600;
+  background: rgba(0,201,167,0.15); color: var(--primary);
+}
+
+/* ── PROFILE SCREEN ────────────────────────────────────── */
+.profile-hero {
+  padding: 20px 20px 24px;
+  display: flex; flex-direction: column; align-items: center;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.profile-avatar-big {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--primary), #0099a0);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 28px; color: #0B1929;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 24px rgba(0,201,167,0.3);
+}
+.profile-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px; font-weight: 700; color: var(--text);
+}
+.profile-role { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.profile-badges {
+  display: flex; gap: 8px; margin-top: 12px;
+}
+.profile-badge {
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.stats-row {
+  display: flex; gap: 0;
+  padding: 0 16px; margin-bottom: 16px;
+}
+.stat-item {
+  flex: 1; text-align: center;
+  padding: 16px 0;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700; color: var(--text);
+}
+.stat-lbl { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.menu-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.menu-item:active { background: rgba(255,255,255,0.03); }
+.menu-icon {
+  width: 36px; height: 36px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.menu-icon svg { width: 18px; height: 18px; }
+.menu-text { flex: 1; }
+.menu-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.menu-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.menu-arrow { color: var(--text3); }
+.menu-arrow svg { width: 16px; height: 16px; }
+
+/* ── MODAL OVERLAY ─────────────────────────────────────── */
+.modal-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%;
+  background: var(--bg2);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--border2);
+  padding: 0 0 32px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle {
+  width: 36px; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  margin: 12px auto 16px;
+}
+.modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  padding: 0 20px; margin-bottom: 16px;
+}
+.modal-content { padding: 0 20px; }
+
+/* ── TRAINING PLAYER ───────────────────────────────────── */
+.player-screen {
+  position: absolute; inset: 0;
+  background: #000;
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transform: translateY(100%);
+  transition: all 0.35s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+}
+.player-screen.open {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0);
+}
+.player-video {
+  height: 220px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+.player-gradient { position: absolute; inset: 0; }
+.player-play-big {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 1;
+  transition: all 0.15s;
+}
+.player-play-big:active { transform: scale(0.93); }
+.player-play-big svg { width: 26px; height: 26px; color: #fff; margin-left: 3px; }
+.player-back-btn {
+  position: absolute; top: 14px; left: 14px; z-index: 2;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,0.4); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.player-back-btn svg { width: 18px; height: 18px; }
+.player-body {
+  flex: 1; overflow-y: auto; scrollbar-width: none;
+  background: var(--bg); padding: 20px;
+}
+.player-body::-webkit-scrollbar { display: none; }
+.player-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px; font-weight: 700; color: var(--text);
+  margin-bottom: 8px;
+}
+.player-desc { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+.quiz-question {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  margin-bottom: 14px;
+}
+.quiz-opt {
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-size: 14px; color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quiz-opt:active { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+.quiz-opt.correct { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+.quiz-opt.wrong { border-color: var(--danger); color: var(--danger); background: var(--danger-dim); }
+
+/* ── ANIMATIONS ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeInUp 0.4s cubic-bezier(.4,0,.2,1) both; }
+.delay-1 { animation-delay: 0.06s; }
+.delay-2 { animation-delay: 0.12s; }
+.delay-3 { animation-delay: 0.18s; }
+.delay-4 { animation-delay: 0.24s; }
+.delay-5 { animation-delay: 0.30s; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-time" id="clock">09:41</span>
+    <div class="status-icons">
+      <!-- wifi -->
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 8.5a13 13 0 0121 0M5 12a10 10 0 0114 0M8.5 15.5a6 6 0 017 0M12 19h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      <!-- battery -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M20 11v2" stroke-width="3" stroke-linecap="round"/><rect x="3" y="8" width="14" height="8" rx="1" fill="currentColor" stroke="none"/></svg>
+    </div>
+  </div>
+
+  <!-- ── SPLASH ────────────────────────────────────────── -->
+  <div class="screen active" id="splash">
+    <div class="splash-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(0,201,167,0.15)" stroke="currentColor"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="splash-name">Safe<span>Work</span></div>
+    <div class="splash-name" style="font-size:32px; color: var(--primary); margin-top:-6px; font-family:'Space Grotesk',sans-serif; font-weight:700;">Pro</div>
+    <div class="splash-tag">Segurança do trabalho na palma da mão</div>
+    <button class="btn-primary" onclick="goTo('home')">Entrar no App</button>
+    <div style="margin-top:14px; font-size:11px; color:var(--text3);">v1.0.0 · SENAI Paraná · 2025</div>
+  </div>
+
+  <!-- ── HOME ──────────────────────────────────────────── -->
+  <div class="screen" id="home">
+    <div class="scroll-area">
+      <div class="home-header fade-in">
+        <div>
+          <div class="home-greeting">Bom dia,</div>
+          <div class="home-name">Marcelo Perotta</div>
+        </div>
+        <div class="avatar" onclick="goTo('profile')">MP</div>
+      </div>
+
+      <!-- Alert banner - interactive -->
+      <div class="alert-banner green fade-in delay-1" id="main-alert" onclick="goTo('alerts')">
+        <div class="alert-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="alert-text">
+          <div class="alert-label" id="alert-level">Segurança Normal</div>
+          <div class="alert-msg" id="alert-msg">Todos os sensores em níveis normais</div>
+          <div class="alert-sub" id="alert-sub">Última atualização: agora</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <!-- Sensor grid -->
+      <div class="section-label fade-in delay-2">Sensores ao vivo</div>
+      <div class="sensor-grid fade-in delay-2">
+        <div class="sensor-card" onclick="goTo('alerts')">
+          <div class="sensor-top">
+            <svg class="sensor-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5a1 1 0 012 0v7a1 1 0 01-2 0V5z"/><path d="M12 15a3 3 0 100 6 3 3 0 000-6z"/></svg>
+            <div class="sensor-status" id="s-temp-dot"></div>
+          </div>
+          <div class="sensor-val" id="s-temp">24<span class="sensor-unit">°C</span></div>
+          <div class="sensor-name">Temperatura</div>
+          <div class="sensor-limit">Limite: 38°C</div>
+        </div>
+        <div class="sensor-card" onclick="goTo('alerts')">
+          <div class="sensor-top">
+            <svg class="sensor-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+            <div class="sensor-status" id="s-noise-dot"></div>
+          </div>
+          <div class="sensor-val" id="s-noise">72<span class="sensor-unit">dB</span></div>
+          <div class="sensor-name">Ruído</div>
+          <div class="sensor-limit">Limite: 85 dB</div>
+        </div>
+        <div class="sensor-card" onclick="goTo('alerts')">
+          <div class="sensor-top">
+            <svg class="sensor-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            <div class="sensor-status" id="s-gas-dot"></div>
+          </div>
+          <div class="sensor-val" id="s-gas">12<span class="sensor-unit">ppm</span></div>
+          <div class="sensor-name">Gases</div>
+          <div class="sensor-limit">Limite: 50 ppm</div>
+        </div>
+        <div class="sensor-card" onclick="goTo('alerts')">
+          <div class="sensor-top">
+            <svg class="sensor-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            <div class="sensor-status" id="s-vibr-dot"></div>
+          </div>
+          <div class="sensor-val" id="s-vibr">0.3<span class="sensor-unit">g</span></div>
+          <div class="sensor-name">Vibração</div>
+          <div class="sensor-limit">Limite: 2.5g</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="section-label fade-in delay-3">Acesso rápido</div>
+      <div class="quick-row fade-in delay-3">
+        <div class="quick-btn" onclick="goTo('epi')">
+          <div class="quick-btn-icon" style="background:rgba(0,201,167,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00C9A7" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <span>Checklist EPI</span>
+        </div>
+        <div class="quick-btn" onclick="goTo('training')">
+          <div class="quick-btn-icon" style="background:rgba(255,181,71,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FFB547" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <span>Treinamentos</span>
+        </div>
+        <div class="quick-btn" onclick="goTo('alerts')">
+          <div class="quick-btn-icon" style="background:rgba(255,92,92,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF5C5C" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-5-5.917V4a1 1 0 10-2 0v1.083A6 6 0 006 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          </div>
+          <span>Alertas</span>
+        </div>
+        <div class="quick-btn" onclick="openModal('reportModal')">
+          <div class="quick-btn-icon" style="background:rgba(139,175,196,0.15);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#8BAFC4" stroke-width="2" stroke-linecap="round"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <span>Reportar</span>
+        </div>
+      </div>
+
+      <!-- Recent events -->
+      <div class="section-label fade-in delay-4">Eventos recentes</div>
+      <div class="card fade-in delay-4">
+        <div class="event-item">
+          <div class="event-dot green"></div>
+          <div class="event-body">
+            <div class="event-title">Checklist EPI concluído</div>
+            <div class="event-time">08:02 · Costureira — Setor B</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot yellow"></div>
+          <div class="event-body">
+            <div class="event-title">Ruído elevado detectado — 88 dB</div>
+            <div class="event-time">07:45 · Setor A · Durou 3 min</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot green"></div>
+          <div class="event-body">
+            <div class="event-title">Treinamento concluído: Protetor auricular</div>
+            <div class="event-time">Ontem, 16:30 · Nota: 90%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EPI status bar -->
+      <div class="card fade-in delay-5" onclick="goTo('epi')" style="cursor:pointer; display:flex; align-items:center; gap:14px;">
+        <div style="flex:1">
+          <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;">EPI de hoje — 4/6 itens</div>
+          <div class="meter-bar" style="margin:0;">
+            <div class="meter-fill" style="width:67%; background:var(--warn);"></div>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" onclick="goTo('alerts')" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="nav-dot"></div>
+        <span>Alertas</span>
+      </button>
+      <button class="nav-item" onclick="goTo('epi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>EPI</span>
+      </button>
+      <button class="nav-item" onclick="goTo('training')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Treinar</span>
+      </button>
+      <button class="nav-item" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ALERTS SCREEN ──────────────────────────────────── -->
+  <div class="screen" id="alerts">
+    <div class="scroll-area">
+      <div class="page-header fade-in">
+        <div class="page-title">Alertas & Sensores</div>
+        <div class="page-subtitle">Simule diferentes níveis de risco</div>
+      </div>
+
+      <div class="risk-meter card fade-in delay-1" style="margin:0 16px 12px;">
+        <div class="meter-label">Nível de risco atual</div>
+        <div class="meter-bar">
+          <div class="meter-fill" id="risk-bar" style="width:20%; background: linear-gradient(90deg, #00C9A7, #FFB547);"></div>
+        </div>
+        <div class="meter-ticks">
+          <span style="color:var(--primary)">Baixo</span>
+          <span style="color:var(--warn)">Médio</span>
+          <span style="color:var(--danger)">Alto</span>
+        </div>
+      </div>
+
+      <div class="section-label fade-in delay-1">Simular cenário</div>
+      <div class="sim-row fade-in delay-1">
+        <button class="sim-btn green" onclick="setRisk('green')">🟢 Normal</button>
+        <button class="sim-btn yellow" onclick="setRisk('yellow')">🟡 Atenção</button>
+        <button class="sim-btn red" onclick="setRisk('red')">🔴 Perigo</button>
+      </div>
+
+      <div class="section-label fade-in delay-2">Leituras dos sensores</div>
+
+      <div class="alert-card card-green fade-in delay-2" id="ac-temp" onclick="openModal('sensorModal','temp')">
+        <div class="alert-card-header">
+          <div class="alert-card-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="alert-card-title">Temperatura — <span id="ac-temp-val">24°C</span></div>
+            <div class="alert-card-val">Limite seguro: 38°C · Status: <span id="ac-temp-st">Normal</span></div>
+          </div>
+          <div class="alert-badge badge-green" id="ac-temp-badge">OK</div>
+        </div>
+      </div>
+
+      <div class="alert-card card-green fade-in delay-2" id="ac-noise" onclick="openModal('sensorModal','noise')">
+        <div class="alert-card-header">
+          <div class="alert-card-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="alert-card-title">Ruído — <span id="ac-noise-val">72 dB</span></div>
+            <div class="alert-card-val">Limite seguro: 85 dB · Status: <span id="ac-noise-st">Normal</span></div>
+          </div>
+          <div class="alert-badge badge-green" id="ac-noise-badge">OK</div>
+        </div>
+      </div>
+
+      <div class="alert-card card-green fade-in delay-3" id="ac-gas" onclick="openModal('sensorModal','gas')">
+        <div class="alert-card-header">
+          <div class="alert-card-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="alert-card-title">Gases — <span id="ac-gas-val">12 ppm</span></div>
+            <div class="alert-card-val">Limite seguro: 50 ppm · Status: <span id="ac-gas-st">Normal</span></div>
+          </div>
+          <div class="alert-badge badge-green" id="ac-gas-badge">OK</div>
+        </div>
+      </div>
+
+      <div class="alert-card card-green fade-in delay-3" id="ac-vibr">
+        <div class="alert-card-header">
+          <div class="alert-card-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="alert-card-title">Vibração — <span id="ac-vibr-val">0.3g</span></div>
+            <div class="alert-card-val">Limite seguro: 2.5g · Status: <span id="ac-vibr-st">Normal</span></div>
+          </div>
+          <div class="alert-badge badge-green" id="ac-vibr-badge">OK</div>
+        </div>
+      </div>
+
+      <div class="section-label fade-in delay-4">Orientações de ação</div>
+      <div class="card fade-in delay-4" id="action-guide">
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          <div style="width:32px; height:32px; border-radius:10px; background:var(--primary-dim); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px;" id="guide-title">Ambiente seguro</div>
+            <div style="font-size:12px; color:var(--text2); line-height:1.6;" id="guide-body">Todos os sensores dentro dos limites normais. Continue usando seus EPIs e mantenha atenção às máquinas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item active" onclick="goTo('alerts')" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <span>Alertas</span>
+      </button>
+      <button class="nav-item" onclick="goTo('epi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>EPI</span>
+      </button>
+      <button class="nav-item" onclick="goTo('training')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Treinar</span>
+      </button>
+      <button class="nav-item" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── EPI SCREEN ─────────────────────────────────────── -->
+  <div class="screen" id="epi">
+    <div class="scroll-area">
+      <div class="page-header fade-in">
+        <div class="page-title">Checklist de EPIs</div>
+        <div class="page-subtitle">Marque os equipamentos que você está usando</div>
+      </div>
+
+      <div class="progress-ring-wrap fade-in delay-1">
+        <div class="ring-container">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="45"/>
+            <circle class="ring-fill" id="epi-ring" cx="55" cy="55" r="45"/>
+          </svg>
+          <div class="ring-text">
+            <div class="ring-pct" id="epi-pct">0%</div>
+            <div class="ring-sub" id="epi-count">0/6</div>
+          </div>
+        </div>
+        <div class="ring-label" id="epi-status-label">Selecione sua função e marque os EPIs</div>
+      </div>
+
+      <div class="function-selector fade-in delay-2" id="func-selector">
+        <button class="func-chip active" onclick="selectFunc(this,'costureira')">Costureira</button>
+        <button class="func-chip" onclick="selectFunc(this,'cortador')">Cortador</button>
+        <button class="func-chip" onclick="selectFunc(this,'tinteiro')">Tinteiro</button>
+        <button class="func-chip" onclick="selectFunc(this,'caldeira')">Caldeira</button>
+      </div>
+
+      <div id="epi-list" class="fade-in delay-3"></div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" onclick="goTo('alerts')" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="nav-dot"></div>
+        <span>Alertas</span>
+      </button>
+      <button class="nav-item active" onclick="goTo('epi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>EPI</span>
+      </button>
+      <button class="nav-item" onclick="goTo('training')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Treinar</span>
+      </button>
+      <button class="nav-item" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── TRAINING SCREEN ────────────────────────────────── -->
+  <div class="screen" id="training">
+    <div class="scroll-area">
+      <div class="page-header fade-in">
+        <div class="page-title">Treinamentos</div>
+        <div class="page-subtitle">2 módulos pendentes · 1 concluído</div>
+      </div>
+
+      <!-- Featured -->
+      <div style="margin:0 16px 16px; background:linear-gradient(135deg,#0D4A6B,#0D7377); border-radius:var(--radius); padding:20px; cursor:pointer; position:relative; overflow:hidden;" class="fade-in delay-1" onclick="openPlayer('protetor')">
+        <div style="position:absolute; right:-20px; top:-20px; width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,0.05);"></div>
+        <div style="font-size:10px; font-weight:700; letter-spacing:0.1em; color:rgba(255,255,255,0.6); text-transform:uppercase; margin-bottom:8px;">Módulo Destaque</div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; color:white; margin-bottom:6px;">Protetor Auricular</div>
+        <div style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:16px;">Como usar corretamente para proteção contra ruídos acima de 85 dB</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="background:rgba(255,255,255,0.2); backdrop-filter:blur(8px); border-radius:20px; padding:8px 16px; font-size:12px; font-weight:600; color:white;">▶ Iniciar — 3 min</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.5);">Quiz incluso</div>
+        </div>
+      </div>
+
+      <div class="training-card fade-in delay-2" onclick="openPlayer('cortes')">
+        <div class="training-thumb" style="background:linear-gradient(135deg,#2D1B1B,#4A1515);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF5C5C" stroke-width="1.5" stroke-linecap="round"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="duration-badge">4:30</div>
+        </div>
+        <div class="training-body">
+          <div class="training-title">Prevenção de Cortes — Máquinas de Costura</div>
+          <div class="training-meta">
+            <span>🔴 Obrigatório</span>
+            <span>·</span>
+            <span>4 min 30s</span>
+            <span>·</span>
+            <span>Quiz</span>
+          </div>
+          <div class="training-progress">
+            <div class="training-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="training-card fade-in delay-3" onclick="openPlayer('solventes')">
+        <div class="training-thumb" style="background:linear-gradient(135deg,#1a2D1B,#1a4015);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00C9A7" stroke-width="1.5" stroke-linecap="round"><path d="M12 2a7 7 0 017 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="duration-badge">5:00</div>
+        </div>
+        <div class="training-body">
+          <div class="training-title">Manuseio Seguro de Solventes e Tintas</div>
+          <div class="training-meta">
+            <span>🟡 Recomendado</span>
+            <span>·</span>
+            <span>5 min</span>
+            <span>·</span>
+            <span>Quiz</span>
+          </div>
+          <div class="training-progress">
+            <div class="training-progress-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="training-card fade-in delay-4" style="opacity:0.8;" onclick="openPlayer('parada')">
+        <div class="training-thumb" style="background:linear-gradient(135deg,#1a1a2D,#1a1a50);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8BAFC4" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="play-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="duration-badge">2:15</div>
+        </div>
+        <div class="training-body">
+          <div class="training-title">Parada de Emergência das Máquinas</div>
+          <div class="training-meta">
+            <div class="completed-badge">✓ Concluído</div>
+            <span>·</span>
+            <span>2 min 15s</span>
+            <span>·</span>
+            <span>Nota: 90%</span>
+          </div>
+          <div class="training-progress">
+            <div class="training-progress-fill" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" onclick="goTo('alerts')" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="nav-dot"></div>
+        <span>Alertas</span>
+      </button>
+      <button class="nav-item" onclick="goTo('epi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>EPI</span>
+      </button>
+      <button class="nav-item active" onclick="goTo('training')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Treinar</span>
+      </button>
+      <button class="nav-item" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── PROFILE SCREEN ─────────────────────────────────── -->
+  <div class="screen" id="profile">
+    <div class="scroll-area">
+      <div class="profile-hero fade-in">
+        <div class="profile-avatar-big">AC</div>
+        <div class="profile-name">Marcelo Perotta</div>
+        <div class="profile-role">Costureira Sênior · Setor B</div>
+        <div class="profile-badges">
+          <div class="profile-badge" style="background:rgba(0,201,167,0.15); color:var(--primary);">🏆 7 dias seguro</div>
+          <div class="profile-badge" style="background:rgba(255,181,71,0.15); color:var(--warn);">⭐ EPI Aderente</div>
+        </div>
+      </div>
+
+      <div class="stats-row card fade-in delay-1" style="margin:0 16px 12px; padding:0; display:flex;">
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--primary);">12</div>
+          <div class="stat-lbl">Nº EPIs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--warn);">3</div>
+          <div class="stat-lbl">Treinam.</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" style="color:var(--danger);">0</div>
+          <div class="stat-lbl">Incidentes</div>
+        </div>
+      </div>
+
+      <div class="section-label fade-in delay-2">Minha conta</div>
+      <div class="card fade-in delay-2" style="padding:0; overflow:hidden;">
+        <div class="menu-item">
+          <div class="menu-icon" style="background:rgba(0,201,167,0.12);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title">Histórico de EPIs</div>
+            <div class="menu-sub">Últimos 30 dias</div>
+          </div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon" style="background:rgba(255,181,71,0.12);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5v-4m0-4h.01"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title">Certificados</div>
+            <div class="menu-sub">1 módulo concluído</div>
+          </div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon" style="background:rgba(139,175,196,0.12);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title">Relatório pessoal</div>
+            <div class="menu-sub">Gerar PDF</div>
+          </div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="section-label fade-in delay-3">Configurações</div>
+      <div class="card fade-in delay-3" style="padding:0; overflow:hidden;">
+        <div class="menu-item">
+          <div class="menu-icon" style="background:rgba(139,175,196,0.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title">Notificações</div>
+            <div class="menu-sub">Alertas ativos</div>
+          </div>
+          <div style="width:38px; height:22px; background:var(--primary); border-radius:11px; position:relative; cursor:pointer; flex-shrink:0;">
+            <div style="position:absolute; right:3px; top:3px; width:16px; height:16px; background:#0B1929; border-radius:50%;"></div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-icon" style="background:rgba(139,175,196,0.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 19.07l1.41-1.41M20 12h-2M6 12H4M17.66 17.66l-1.41-1.41M7.76 7.76L6.34 6.34M12 2v2M12 20v2"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title">Modo offline</div>
+            <div class="menu-sub">Sempre ativo</div>
+          </div>
+          <div style="width:38px; height:22px; background:var(--primary); border-radius:11px; position:relative; cursor:pointer; flex-shrink:0;">
+            <div style="position:absolute; right:3px; top:3px; width:16px; height:16px; background:#0B1929; border-radius:50%;"></div>
+          </div>
+        </div>
+        <div class="menu-item" style="border:none;">
+          <div class="menu-icon" style="background:rgba(255,92,92,0.1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </div>
+          <div class="menu-text">
+            <div class="menu-title" style="color:var(--danger);">Sair</div>
+            <div class="menu-sub">Voltar para o login</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding:20px 0 8px; font-size:11px; color:var(--text3);">
+        SafeWork v1.0.0 · SESI Referência de Maringá · 2025
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('home')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Início</span>
+      </button>
+      <button class="nav-item" onclick="goTo('alerts')" style="position:relative;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="nav-dot"></div>
+        <span>Alertas</span>
+      </button>
+      <button class="nav-item" onclick="goTo('epi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>EPI</span>
+      </button>
+      <button class="nav-item" onclick="goTo('training')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Treinar</span>
+      </button>
+      <button class="nav-item active" onclick="goTo('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── TRAINING PLAYER ────────────────────────────────── -->
+  <div class="player-screen" id="playerScreen">
+    <div class="player-video" id="playerThumb">
+      <div class="player-gradient" id="playerGradient"></div>
+      <button class="player-back-btn" onclick="closePlayer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="player-play-big" id="playerPlayBtn" onclick="startQuiz()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    </div>
+    <div class="player-body" id="playerBody"></div>
+  </div>
+
+  <!-- ── MODALS ─────────────────────────────────────────── -->
+  <div class="modal-overlay" id="sensorModal" onclick="closeModal('sensorModal')">
+    <div class="modal-sheet" onclick="e=>e.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="sensorModalTitle">Sensor</div>
+      <div class="modal-content" id="sensorModalBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="reportModal" onclick="closeModal('reportModal')">
+    <div class="modal-sheet" onclick="e=>e.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Reportar ocorrência</div>
+      <div class="modal-content">
+        <div style="display:flex; flex-direction:column; gap:10px; padding-bottom:8px;">
+          <div style="font-size:13px; color:var(--text2); margin-bottom:4px;">Selecione o tipo:</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="padding:14px; background:var(--danger-dim); border:1.5px solid rgba(255,92,92,0.3); border-radius:12px; text-align:center; cursor:pointer;" onclick="closeModal('reportModal')">
+              <div style="font-size:20px; margin-bottom:6px;">⚠️</div>
+              <div style="font-size:12px; font-weight:600; color:var(--danger);">Acidente</div>
+            </div>
+            <div style="padding:14px; background:var(--warn-dim); border:1.5px solid rgba(255,181,71,0.3); border-radius:12px; text-align:center; cursor:pointer;" onclick="closeModal('reportModal')">
+              <div style="font-size:20px; margin-bottom:6px;">👁️</div>
+              <div style="font-size:12px; font-weight:600; color:var(--warn);">Quase acidente</div>
+            </div>
+            <div style="padding:14px; background:var(--primary-dim); border:1.5px solid rgba(0,201,167,0.3); border-radius:12px; text-align:center; cursor:pointer;" onclick="closeModal('reportModal')">
+              <div style="font-size:20px; margin-bottom:6px;">🔧</div>
+              <div style="font-size:12px; font-weight:600; color:var(--primary);">Equipamento</div>
+            </div>
+            <div style="padding:14px; background:rgba(139,175,196,0.1); border:1.5px solid var(--border); border-radius:12px; text-align:center; cursor:pointer;" onclick="closeModal('reportModal')">
+              <div style="font-size:20px; margin-bottom:6px;">💬</div>
+              <div style="font-size:12px; font-weight:600; color:var(--text2);">Sugestão</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let currentScreen = 'splash';
+let riskLevel = 'green';
+let epiChecked = {};
+let currentFunc = 'costureira';
+
+const epiData = {
+  costureira: [
+    { id:'dedal', name:'Dedal de segurança', desc:'Proteção para os dedos durante costura', required:true },
+    { id:'oculos', name:'Óculos de proteção', desc:'EPI ocular contra partículas e fios', required:true },
+    { id:'auricular', name:'Protetor auricular', desc:'Redução de ruído — uso obrigatório acima de 85 dB', required:true },
+    { id:'calçado', name:'Calçado fechado', desc:'Proteção dos pés contra agulhas e alfinetes', required:true },
+    { id:'avental', name:'Avental de trabalho', desc:'Proteção do corpo contra fios e poeira têxtil', required:false },
+    { id:'mascara', name:'Máscara de tecido', desc:'Proteção respiratória contra poeira e fibras', required:false },
+  ],
+  cortador: [
+    { id:'luva', name:'Luva de malha de aço', desc:'Proteção contra cortes de facas e tesouras', required:true },
+    { id:'avental-metal', name:'Avental de malha metálica', desc:'Proteção abdominal contra lâminas', required:true },
+    { id:'oculos', name:'Óculos de proteção', desc:'EPI ocular durante o corte', required:true },
+    { id:'auricular', name:'Protetor auricular', desc:'Redução de ruído das máquinas de corte', required:true },
+    { id:'calçado', name:'Bota com biqueira de aço', desc:'Proteção total dos pés', required:true },
+    { id:'capacete', name:'Capacete leve', desc:'Proteção craniana em áreas de corte mecanizado', required:false },
+  ],
+  tinteiro: [
+    { id:'luva-quimica', name:'Luva química nitrílica', desc:'Proteção contra corantes e solventes', required:true },
+    { id:'mascara-gas', name:'Máscara com filtro químico', desc:'Proteção respiratória contra vapores tóxicos', required:true },
+    { id:'avental', name:'Avental impermeável', desc:'Proteção do corpo contra respingos de tinta', required:true },
+    { id:'oculos', name:'Óculos de proteção química', desc:'EPI ocular vedado contra respingos', required:true },
+    { id:'bota', name:'Bota impermeável', desc:'Proteção dos pés contra derramamentos', required:true },
+    { id:'auricular', name:'Protetor auricular', desc:'Proteção auditiva nas cabines de tingimento', required:false },
+  ],
+  caldeira: [
+    { id:'capacete', name:'Capacete de segurança', desc:'Proteção craniana obrigatória na área da caldeira', required:true },
+    { id:'luva-termica', name:'Luva térmica', desc:'Proteção contra queimaduras', required:true },
+    { id:'mascara-gas', name:'Máscara com filtro', desc:'Proteção respiratória contra vapor e gases', required:true },
+    { id:'avental-termico', name:'Avental termorresistente', desc:'Proteção do corpo contra calor e respingos', required:true },
+    { id:'bota', name:'Bota de segurança', desc:'Proteção dos pés com biqueira e isolamento elétrico', required:true },
+    { id:'auricular', name:'Protetor auricular premium', desc:'Ruído extremamente elevado — NRR mínimo 27 dB', required:true },
+  ]
+};
+
+const riskScenarios = {
+  green: {
+    temp: '24°C', noise: '72 dB', gas: '12 ppm', vibr: '0.3g',
+    tempSt: 'Normal', noiseSt: 'Normal', gasSt: 'Normal', vibrSt: 'Normal',
+    bar: '20%', barGrad: 'linear-gradient(90deg,#00C9A7,#00C9A7)',
+    alertClass: 'green', alertLevel: 'Segurança Normal',
+    alertMsg: 'Todos os sensores em níveis normais',
+    alertSub: 'Última atualização: agora',
+    guideTitle: 'Ambiente seguro',
+    guideBody: 'Todos os sensores dentro dos limites normais. Continue usando seus EPIs e mantenha atenção às máquinas.',
+    guideColor: 'primary',
+    tempDot: '', noiseDot: '', gasDot: '', vibrDot: '',
+    tempBadge: 'OK', noiseBadge: 'OK', gasBadge: 'OK', vibrBadge: 'OK',
+    tempBadgeClass: 'badge-green', noiseBadgeClass: 'badge-green', gasBadgeClass: 'badge-green', vibrBadgeClass: 'badge-green',
+    acTempClass: 'card-green', acNoiseClass: 'card-green', acGasClass: 'card-green', acVibrClass: 'card-green',
+    acTempIcon: 'icon-green', acNoiseIcon: 'icon-green', acGasIcon: 'icon-green', acVibrIcon: 'icon-green',
+  },
+  yellow: {
+    temp: '34°C', noise: '88 dB', gas: '32 ppm', vibr: '1.8g',
+    tempSt: 'Atenção', noiseSt: '⚠ Elevado', gasSt: 'Atenção', vibrSt: 'Atenção',
+    bar: '58%', barGrad: 'linear-gradient(90deg,#00C9A7,#FFB547)',
+    alertClass: 'yellow', alertLevel: '⚠ Atenção Recomendada',
+    alertMsg: 'Ruído 88 dB — acima do recomendado',
+    alertSub: 'Verifique seu protetor auricular',
+    guideTitle: '⚠ Condição de Atenção',
+    guideBody: 'Ruído acima de 85 dB detectado. Certifique-se de que seu protetor auricular está corretamente instalado. Informe o supervisor se persistir por mais de 5 minutos.',
+    guideColor: 'warn',
+    tempDot: '', noiseDot: 'warn', gasDot: '', vibrDot: 'warn',
+    tempBadge: 'OK', noiseBadge: '88 dB', gasBadge: 'OK', vibrBadge: 'ALTO',
+    tempBadgeClass: 'badge-green', noiseBadgeClass: 'badge-yellow', gasBadgeClass: 'badge-green', vibrBadgeClass: 'badge-yellow',
+    acTempClass: 'card-green', acNoiseClass: 'card-yellow', acGasClass: 'card-green', acVibrClass: 'card-yellow',
+    acTempIcon: 'icon-green', acNoiseIcon: 'icon-yellow', acGasIcon: 'icon-green', acVibrIcon: 'icon-yellow',
+  },
+  red: {
+    temp: '42°C', noise: '97 dB', gas: '68 ppm', vibr: '3.1g',
+    tempSt: '🔴 CRÍTICO', noiseSt: '🔴 CRÍTICO', gasSt: '🔴 CRÍTICO', vibrSt: '🔴 CRÍTICO',
+    bar: '92%', barGrad: 'linear-gradient(90deg,#FFB547,#FF5C5C)',
+    alertClass: 'red', alertLevel: '🚨 PERIGO IMEDIATO',
+    alertMsg: 'Múltiplos sensores em nível crítico!',
+    alertSub: 'PARE a máquina e avise o supervisor agora',
+    guideTitle: '🚨 Ação Imediata Necessária',
+    guideBody: 'PARE imediatamente o que está fazendo. Ruído, temperatura e gases acima dos limites críticos. Afaste-se da área e acione o botão de emergência. Notifique o supervisor.',
+    guideColor: 'danger',
+    tempDot: 'danger', noiseDot: 'danger', gasDot: 'danger', vibrDot: 'danger',
+    tempBadge: '42°C!', noiseBadge: '97 dB!', gasBadge: '68 ppm!', vibrBadge: '3.1g!',
+    tempBadgeClass: 'badge-red', noiseBadgeClass: 'badge-red', gasBadgeClass: 'badge-red', vibrBadgeClass: 'badge-red',
+    acTempClass: 'card-red', acNoiseClass: 'card-red', acGasClass: 'card-red', acVibrClass: 'card-red',
+    acTempIcon: 'icon-red', acNoiseIcon: 'icon-red', acGasIcon: 'icon-red', acVibrIcon: 'icon-red',
+  }
+};
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+function goTo(screen) {
+  const prev = document.getElementById(currentScreen);
+  const next = document.getElementById(screen);
+  if (!next || currentScreen === screen) return;
+  prev.classList.remove('active');
+  next.classList.add('active');
+  currentScreen = screen;
+  if (screen === 'epi') renderEpi(currentFunc);
+}
+
+// ── CLOCK ──────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.getHours().toString().padStart(2,'0') + ':' +
+    now.getMinutes().toString().padStart(2,'0');
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+// ── RISK SIMULATION ────────────────────────────────────────────────────────
+function setRisk(level) {
+  riskLevel = level;
+  const s = riskScenarios[level];
+
+  document.getElementById('s-temp').innerHTML = s.temp.replace('°C','') + '<span class="sensor-unit">°C</span>';
+  document.getElementById('s-noise').innerHTML = s.noise.replace(' dB','') + '<span class="sensor-unit">dB</span>';
+  document.getElementById('s-gas').innerHTML = s.gas.replace(' ppm','') + '<span class="sensor-unit">ppm</span>';
+  document.getElementById('s-vibr').innerHTML = s.vibr.replace('g','') + '<span class="sensor-unit">g</span>';
+
+  ['temp','noise','gas','vibr'].forEach(k => {
+    const dot = document.getElementById(`s-${k}-dot`);
+    dot.className = 'sensor-status' + (s[`${k}Dot`] ? ' ' + s[`${k}Dot`] : '');
+  });
+
+  const banner = document.getElementById('main-alert');
+  banner.className = `alert-banner ${s.alertClass}`;
+  document.getElementById('alert-level').textContent = s.alertLevel;
+  document.getElementById('alert-msg').textContent = s.alertMsg;
+  document.getElementById('alert-sub').textContent = s.alertSub;
+
+  document.getElementById('risk-bar').style.width = s.bar;
+  document.getElementById('risk-bar').style.background = s.barGrad;
+
+  ['temp','noise','gas','vibr'].forEach(k => {
+    const card = document.getElementById(`ac-${k}`);
+    if (card) {
+      card.className = `alert-card ${s[`ac${k.charAt(0).toUpperCase()+k.slice(1)}Class`]}`;
+      const icon = card.querySelector('.alert-card-icon');
+      if (icon) icon.className = `alert-card-icon ${s[`ac${k.charAt(0).toUpperCase()+k.slice(1)}Icon`]}`;
+      const badge = document.getElementById(`ac-${k}-badge`);
+      if (badge) { badge.textContent = s[`${k}Badge`]; badge.className = `alert-badge ${s[`${k}BadgeClass`]}`; }
+      const val = document.getElementById(`ac-${k}-val`);
+      if (val) val.textContent = s[k];
+      const st = document.getElementById(`ac-${k}-st`);
+      if (st) st.textContent = s[`${k}St`];
+    }
+  });
+
+  const guideColors = { primary: 'var(--primary)', warn: 'var(--warn)', danger: 'var(--danger)' };
+  document.getElementById('guide-title').textContent = s.guideTitle;
+  document.getElementById('guide-body').textContent = s.guideBody;
+  document.getElementById('guide-title').style.color = guideColors[s.guideColor];
+
+  if (level === 'red' && navigator.vibrate) navigator.vibrate([200,100,200,100,300]);
+}
+
+// ── EPI CHECKLIST ──────────────────────────────────────────────────────────
+function selectFunc(el, func) {
+  document.querySelectorAll('.func-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentFunc = func;
+  epiChecked = {};
+  renderEpi(func);
+}
+
+function renderEpi(func) {
+  const items = epiData[func];
+  const list = document.getElementById('epi-list');
+  list.innerHTML = items.map((item, i) => `
+    <div class="epi-item" onclick="toggleEpi('${item.id}','${func}')">
+      <div class="epi-checkbox ${epiChecked[item.id] ? 'checked' : ''}" id="epi-cb-${item.id}">
+        ${epiChecked[item.id] ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>' : ''}
+      </div>
+      <div class="epi-info">
+        <div class="epi-name" style="${epiChecked[item.id] ? 'text-decoration:line-through; opacity:0.6;' : ''}">${item.name}</div>
+        <div class="epi-desc">${item.desc}</div>
+      </div>
+      <div class="epi-required ${item.required ? 'req-yes' : 'req-no'}">${item.required ? 'Obrig.' : 'Recom.'}</div>
+    </div>
+  `).join('');
+  updateEpiProgress(func);
+}
+
+function toggleEpi(id, func) {
+  epiChecked[id] = !epiChecked[id];
+  renderEpi(func);
+}
+
+function updateEpiProgress(func) {
+  const items = epiData[func];
+  const total = items.length;
+  const done = items.filter(i => epiChecked[i.id]).length;
+  const pct = Math.round(done / total * 100);
+  const circumference = 283;
+  const offset = circumference - (pct / 100) * circumference;
+  document.getElementById('epi-ring').style.strokeDashoffset = offset;
+  document.getElementById('epi-pct').textContent = pct + '%';
+  document.getElementById('epi-count').textContent = done + '/' + total;
+  const labels = ['Selecione sua função e marque os EPIs', 'Bom começo! Continue verificando...', 'Quase lá! Faltam poucos itens...', '✅ Todos os EPIs verificados!'];
+  const idx = pct === 0 ? 0 : pct < 50 ? 1 : pct < 100 ? 2 : 3;
+  document.getElementById('epi-status-label').textContent = labels[idx];
+  document.getElementById('epi-ring').style.stroke = pct === 100 ? 'var(--primary)' : pct > 60 ? '#7EC8E3' : 'var(--warn)';
+}
+
+// ── MODALS ─────────────────────────────────────────────────────────────────
+function openModal(id, extra) {
+  if (id === 'sensorModal' && extra) {
+    const titles = { temp:'Temperatura Ambiente', noise:'Ruído Ambiental', gas:'Concentração de Gases' };
+    const s = riskScenarios[riskLevel];
+    const bodies = {
+      temp: `<p style="font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:14px;">Sensor de temperatura instalado no setor B. Limite seguro de exposição: <strong style="color:var(--text)">38°C</strong>.</p><div style="background:var(--bg3); border-radius:12px; padding:16px; margin-bottom:12px;"><div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:700; color:var(--primary);">${s.temp}</div><div style="font-size:12px; color:var(--text3);">Leitura atual · ${s.tempSt}</div></div><p style="font-size:12px; color:var(--text3);">Se a temperatura ultrapassar 38°C, afaste-se da área e comunique o supervisor imediatamente.</p>`,
+      noise: `<p style="font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:14px;">Sensor de ruído (decibelímetro). Acima de <strong style="color:var(--text)">85 dB</strong> é obrigatório o uso de protetor auricular. Acima de 95 dB, o tempo máximo sem proteção é zero.</p><div style="background:var(--bg3); border-radius:12px; padding:16px; margin-bottom:12px;"><div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:700; color:${riskLevel==='red'?'var(--danger)':riskLevel==='yellow'?'var(--warn)':'var(--primary)'};">${s.noise}</div><div style="font-size:12px; color:var(--text3);">Leitura atual · ${s.noiseSt}</div></div><p style="font-size:12px; color:var(--text3);">NR-15 — Atividade laboral: exposição máxima de 8h/dia até 85 dB.</p>`,
+      gas: `<p style="font-size:14px; color:var(--text2); line-height:1.7; margin-bottom:14px;">Sensor de gases detecta solventes e vapores químicos. Limite de exposição: <strong style="color:var(--text)">50 ppm</strong>.</p><div style="background:var(--bg3); border-radius:12px; padding:16px; margin-bottom:12px;"><div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:700; color:var(--primary);">${s.gas}</div><div style="font-size:12px; color:var(--text3);">Leitura atual · ${s.gasSt}</div></div><p style="font-size:12px; color:var(--text3);">Em caso de detecção acima de 50 ppm, evacuar a área e acionar ventilação forçada.</p>`,
+    };
+    document.getElementById('sensorModalTitle').textContent = titles[extra] || 'Sensor';
+    document.getElementById('sensorModalBody').innerHTML = bodies[extra] || '';
+  }
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── TRAINING PLAYER ────────────────────────────────────────────────────────
+const trainingData = {
+  protetor: {
+    title: 'Protetor Auricular — Uso Correto',
+    gradient: 'linear-gradient(135deg,#0D4A6B,#0D7377)',
+    desc: 'O protetor auricular é o EPI mais importante para trabalhadoras e trabalhadores expostos a ruídos acima de 85 dB. Neste módulo, você aprende como encaixar corretamente, verificar a vedação e cuidar do equipamento para máxima eficácia.',
+    question: 'Qual é o limite de ruído que exige o uso obrigatório de protetor auricular, segundo a NR-15?',
+    options: ['65 dB', '75 dB', '85 dB', '95 dB'],
+    correct: 2
+  },
+  cortes: {
+    title: 'Prevenção de Cortes — Máquinas de Costura',
+    gradient: 'linear-gradient(135deg,#2D1B1B,#5C2020)',
+    desc: 'As máquinas de costura são a principal causa de acidentes de trabalho na indústria têxtil. Agulhas, facas de corte e tesouras industriais exigem postura correta, foco total e EPIs específicos.',
+    question: 'Em caso de ferimento com agulha durante a costura, o que você deve fazer PRIMEIRO?',
+    options: ['Continuar trabalhando e reportar no final do turno', 'Parar imediatamente, pressionar o local e chamar o socorro', 'Colocar adesivo e continuar', 'Avisar apenas o colega ao lado'],
+    correct: 1
+  },
+  solventes: {
+    title: 'Manuseio Seguro de Solventes',
+    gradient: 'linear-gradient(135deg,#1a2D1B,#1a4015)',
+    desc: 'Solventes e tintas industriais contêm substâncias tóxicas que podem causar danos sérios por inalação ou contato com a pele. Luva química, máscara com filtro e avental impermeável são indispensáveis.',
+    question: 'Qual EPI é OBRIGATÓRIO ao manusear tintas e solventes industriais?',
+    options: ['Apenas avental de algodão', 'Luva nitrílica + máscara com filtro químico', 'Protetor auricular', 'Capacete de segurança'],
+    correct: 1
+  },
+  parada: {
+    title: 'Parada de Emergência',
+    gradient: 'linear-gradient(135deg,#1a1a2D,#252550)',
+    desc: 'Saber acionar a parada de emergência corretamente pode evitar acidentes graves. Todas as máquinas possuem botão de emergência vermelho que deve ser acionado imediatamente em caso de risco.',
+    question: 'Quando você deve acionar o botão de emergência da máquina?',
+    options: ['Apenas quando receber ordem do supervisor', 'Somente no fim do turno', 'Imediatamente ao perceber qualquer risco à segurança', 'Apenas quando a máquina travar'],
+    correct: 2
+  }
+};
+let currentTraining = null;
+let quizAnswered = false;
+
+function openPlayer(id) {
+  const t = trainingData[id];
+  if (!t) return;
+  currentTraining = id;
+  quizAnswered = false;
+  document.getElementById('playerGradient').style.background = t.gradient;
+  document.getElementById('playerPlayBtn').style.display = 'flex';
+  document.getElementById('playerBody').innerHTML = `
+    <div class="player-title">${t.title}</div>
+    <div class="player-desc">${t.desc}</div>
+    <div style="background:var(--card); border-radius:12px; padding:16px; border:1px solid var(--border);">
+      <div style="font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Quiz</div>
+      <div class="quiz-question" id="qQuestion">${t.question}</div>
+      <div id="qOptions">${t.options.map((o,i)=>`<div class="quiz-opt" id="qo-${i}" onclick="answerQuiz(${i})">${o}</div>`).join('')}</div>
+    </div>
+  `;
+  document.getElementById('playerScreen').classList.add('open');
+}
+
+function startQuiz() {
+  document.getElementById('playerPlayBtn').style.display = 'none';
+}
+
+function answerQuiz(idx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const t = trainingData[currentTraining];
+  for (let i = 0; i < t.options.length; i++) {
+    const el = document.getElementById(`qo-${i}`);
+    if (i === t.correct) el.classList.add('correct');
+    else if (i === idx && i !== t.correct) el.classList.add('wrong');
+    el.style.pointerEvents = 'none';
+  }
+  if (idx === t.correct) {
+    setTimeout(() => {
+      document.getElementById('playerBody').insertAdjacentHTML('beforeend',
+        `<div style="margin-top:16px; padding:16px; background:var(--primary-dim); border-radius:12px; border:1px solid rgba(0,201,167,0.3); text-align:center;">
+          <div style="font-size:28px; margin-bottom:8px;">🎉</div>
+          <div style="font-size:15px; font-weight:700; color:var(--primary);">Correto! Parabéns!</div>
+          <div style="font-size:12px; color:var(--text2); margin-top:4px;">Módulo concluído com sucesso.</div>
+          <button style="margin-top:14px; background:var(--primary); color:#0B1929; border:none; border-radius:10px; padding:12px 24px; font-size:13px; font-weight:700; cursor:pointer; width:100%;" onclick="closePlayer()">Concluir módulo ✓</button>
+        </div>`
+      );
+    }, 300);
+  } else {
+    setTimeout(() => {
+      document.getElementById('playerBody').insertAdjacentHTML('beforeend',
+        `<div style="margin-top:16px; padding:16px; background:var(--danger-dim); border-radius:12px; border:1px solid rgba(255,92,92,0.3);">
+          <div style="font-size:13px; font-weight:600; color:var(--danger);">Resposta incorreta</div>
+          <div style="font-size:12px; color:var(--text2); margin-top:4px;">A resposta correta está destacada em verde. Revise o conteúdo e tente novamente.</div>
+        </div>`
+      );
+    }, 300);
+  }
+}
+
+function closePlayer() {
+  document.getElementById('playerScreen').classList.remove('open');
+}
+
+// Init EPI
+renderEpi('costureira');
+</script>
+</body>
+</html>
